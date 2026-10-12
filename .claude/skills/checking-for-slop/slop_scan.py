@@ -119,10 +119,11 @@ def scan(path, facts_text):
     if re.search(r"repeat\(\s*3\s*,", css): tells.append("a three-equal-column grid (hero → 3 feature cards is the template)")
     if re.search(r"(transition|animation)\s*:", css) and "prefers-reduced-motion" not in css: tells.append("motion present but no prefers-reduced-motion rule")
     # opacity:0 at rest is fine when a script-added class gates it (.motion .x, html.js .x) or it is a hover/pseudo decoration
-    gates = set(re.findall(r"classList\.add\(\s*['\"]([\w-]+)", raw))
+    gates = set(re.findall(r"classList\.(?:add|toggle|remove)\(\s*['\"]([\w-]+)", raw))
     hidden = re.findall(r"([^{}]+)\{([^}]*\bopacity\s*:\s*0(?![.\d])[^}]*)\}", css)
     ungated = [s.strip().split(",")[0][:50] for s, _ in hidden
-               if not any(f".{g}" in s for g in gates) and "::" not in s and ":hover" not in s and ":focus" not in s]
+               if not any(f".{g}" in s for g in gates) and "::" not in s and ":hover" not in s and ":focus" not in s
+               and not re.match(r"\s*(@|from\b|to\b|\d+%)", s)]
     if ungated and "<noscript" not in raw.lower() and "no-js" not in raw:
         tells.append(f"{len(ungated)} rule(s) hide content at rest with no script-gating class or <noscript>: {ungated[0]!r}. Check the page with JavaScript off")
     if re.search(r"repeat\(\s*[2-9]\s*,", css) and "@media" not in css:

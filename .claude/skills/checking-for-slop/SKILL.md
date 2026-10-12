@@ -24,7 +24,7 @@ A number the script flags that is on `FACTS.md` under a different spelling (e.g.
 
 ## Step 2 — Two fresh-context readers
 
-Dispatch two subagents with no project history. Give each **only** the rendered page text (not the source, not `FACTS.md`, not the brief):
+Dispatch two subagents with no project history. Give each **only** the rendered page text: the tab title, every visible string in page order, with buttons and links written as `[button: label]`. Not the source, not `FACTS.md`, not the brief.
 
 1. **First visitor:** "In five seconds: what does this sell, why is it different, what does it cost, what do I do next? Then list every line you would call filler." Also ask the **swap test**: "Replace the brand name with a competitor's. What stops making sense?"
 2. **Copy critic:** "For every sentence, quote the clause that is not a fact about the product, the place, the people or the process. List every number and claim you cannot verify from the text alone."
@@ -33,7 +33,9 @@ Report their findings quoted, not paraphrased. The builder's own copy read does 
 
 ## Step 3 — Report
 
-Lead with the one job: can a visitor do it end to end? Then the FAILs, then the tells with a keep/remove verdict each, then the readers' quotes, then the top three improvements by impact. Log the round in `site/DECISIONS.md`.
+This pass **reports; it does not edit the page.** Fixes are decided with the owner at the review round (CLAUDE.md: ask what problem a note points at before rebuilding).
+
+Lead with the one job: can a visitor do it end to end? Then the FAILs, then the tells with a keep/remove verdict each, then the readers' quotes, then the top three improvements by impact. Log the round in `site/DECISIONS.md`. If the Stage 0 entry there is still the template, say so in the report: a page built without a brief is the finding, not the numbers.
 
 ## Common mistakes
 

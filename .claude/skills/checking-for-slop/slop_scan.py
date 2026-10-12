@@ -80,8 +80,10 @@ def scan(path, facts_text):
     if noalt: fails.append(f"{len(noalt)} <img> without alt: {', '.join(noalt[:3])}")
     if facts_text is not None:
         fnums = numbers(facts_text)
-        missing = sorted(n for n in numbers(text) if n not in fnums and not re.fullmatch(r"(19|20)\d\d", n) or (re.fullmatch(r"(19|20)\d\d", n) and n not in fnums))
-        if missing: fails.append(f"numbers on the page not in FACTS.md: {', '.join(missing)}")
+        missing = sorted(n for n in numbers(text) if n not in fnums)
+        for n in missing:
+            where = next((t for t in p.text if n in re.sub(r"[,\s]", "", t)), "")
+            fails.append(f"number {n} is not in FACTS.md: {where[:70]!r}")
         fdays = [d for d in DAYS if d in facts_text.lower()]
         pdays = [d for d in DAYS if d in low]
         bad = [d for d in pdays if d not in fdays]
@@ -116,6 +118,10 @@ def scan(path, facts_text):
     if len(reveal) >= 3: tells.append(f"{len(reveal)} elements share the same scroll-reveal class (everything fades up the same way)")
     if re.search(r"repeat\(\s*3\s*,", css): tells.append("a three-equal-column grid (hero → 3 feature cards is the template)")
     if re.search(r"(transition|animation)\s*:", css) and "prefers-reduced-motion" not in css: tells.append("motion present but no prefers-reduced-motion rule")
+    if re.search(r"opacity\s*:\s*0\b", css) and "<noscript" not in raw.lower() and "no-js" not in raw:
+        fails.append("elements start at opacity:0 with no <noscript> or no-js fallback: the page is blank with JavaScript off")
+    if re.search(r"repeat\(\s*[2-9]\s*,", css) and "@media" not in css:
+        fails.append("a fixed multi-column grid and no @media rule: it will overflow at 375 px")
     if re.search(r"\b(happy|satisfied|verified) (customer|user|client)\b", low): tells.append("an anonymous testimonial attribution")
     return fails, tells
 

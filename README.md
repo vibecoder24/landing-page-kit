@@ -8,6 +8,7 @@ It is not a theme or a component library. It is a process: a `CLAUDE.md` that wa
 
 ```
 CLAUDE.md               the process Claude follows: 7 stages, review etiquette, ship checklist
+.claude/                skills Claude uses at the stages (see below) and a dev-server entry for the preview pane
 site/
   BRIEF.md              the brief, with a prompt under each heading
   FACTS.md              every number, day, name and price the page may state
@@ -17,7 +18,6 @@ site/
   assets/PROMPTS.md     a log of every generated image or video
   scripts/              two Python scripts for generating stills and video (optional, paid)
   .env.example          where the API key goes
-  .claude/launch.json   a dev-server entry for the Claude Code preview pane
 ```
 
 ## Quick start
@@ -42,6 +42,21 @@ Nothing here needs installing until Stage 4. The stack is decided in Stage 0 and
 | 5 Signature move | The one thing the page does exceptionally | Works, with a reduced-motion fallback |
 | 6 Critique 🛑 | One job, swap test, fresh-context reader, checklists | Top 3 improvements listed |
 | 7 Retrospective | `LEARNINGS.md`, then revise `CLAUDE.md` | |
+
+## The skills
+
+Two skills live in `.claude/skills/` and load automatically when the repo is opened in Claude Code:
+
+- **briefing-the-site** runs the Stage 0 interview: one question at a time, real-or-fictional first, and it writes the brief, the facts sheet and the decisions entry from your answers. If you ask Claude to "just fill it in", it asks the five questions that matter and then drafts, with every guess labelled.
+- **checking-for-slop** is the review step. A Python script scans the built page for ship-checklist failures (placeholders, dead links, missing meta, numbers and weekdays that are not in `FACTS.md`) and for the tells of a generated site (banned words, purple gradients, Inter, emoji, three equal cards, everything fading up). Then two fresh-context readers judge the copy, because the context that wrote a page cannot see its own drift.
+
+Run the scanner by hand any time:
+
+```bash
+python3 .claude/skills/checking-for-slop/slop_scan.py site/index.html --facts site/FACTS.md
+```
+
+Two optional plugins pair well with the kit: the official **frontend-design** skill (a designer's eye for defaults that read as generated) and **superpowers** (brainstorming and planning discipline). Neither is required.
 
 ## Generating images and video (optional)
 

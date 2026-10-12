@@ -47,7 +47,7 @@ Every other document (copy, storyboard, asset brief) holds **current state only*
 ### Stage 0 — Brief
 **What:** `BRIEF.md` defines the audience, the page's one job, the USP, the positioning, the tone, the sections, the signature move, **the name, the hero object or motif, and the stack.** The template in `site/BRIEF.md` has a heading for each.
 **Why:** Generic sites come from having no point of view. If the brief could describe any company in the category, the site will look like any company in the category. On the coffee site, the brief was rewritten on day 2 because the USP was a fact ("grown on one hill") and not a benefit; that rewrite cascaded into the name, the copy and the hero.
-**Your job:** Read it before anything else. If it's vague, contradictory, or missing something you need, ask; don't fill gaps silently. Ask one question at a time. Run the **"so what?" test** on the USP: for each claim, say why a buyer cares. If you can't, the brief isn't done.
+**Your job:** Use the `briefing-the-site` skill in `.claude/skills/`: it sets the order of questions and what the pass writes. Read the brief before anything else. If it's vague, contradictory, or missing something you need, ask; don't fill gaps silently. Ask one question at a time. Run the **"so what?" test** on the USP: for each claim, say why a buyer cares. If you can't, the brief isn't done.
 **Done when:**
 - The USP survives "so what?"
 - The name is chosen, or a naming step is scheduled before Stage 2
@@ -113,7 +113,7 @@ After this gate the brief is **frozen**. A change goes through `DECISIONS.md` wi
 - Use a **fresh-context critic** (a reader or a new session that hasn't seen the history) for copy and first impressions; the builder cannot see its own drift
 - Go through the checklists below
 
-**Your job:** Report what's weak, not just what's done. List the top 3 improvements by impact.
+**Your job:** Use the `checking-for-slop` skill: run its scanner on the built page against `FACTS.md`, then dispatch its two fresh-context readers. Report what's weak, not just what's done. List the top 3 improvements by impact.
 
 ### Stage 7 — Retrospective
 **What:** Write `LEARNINGS.md`: the journey in numbers, what the page got right, where the time went and the rule each lesson gives, the lessons for teaching, and what carries into the next site. Then revise this file.
@@ -128,6 +128,8 @@ After this gate the brief is **frozen**. A change goes through `DECISIONS.md` wi
 - **Run the ship checklist at every deploy**, not once at the end.
 
 ## Ship checklist (every deploy)
+
+The `checking-for-slop` scanner checks the first eight items by inspection; run it before reading the rest.
 
 - The one job works end to end, and every CTA leads to it; no `href="#"`
 - No visible `[brackets]`; every number, day, place and price matches `FACTS.md`

@@ -17,8 +17,8 @@ Scan the **built output** (the deployed HTML or the framework's build), not the 
 
 | Line | Meaning | What to do |
 |---|---|---|
-| `FAIL` | A ship-checklist item wrong by inspection: visible `[brackets]`, dead links, h1 count, missing title/description/og:image/favicon, images without alt, **numbers or weekdays on the page that are not in `FACTS.md`** | Fix before deploy. Exit code 1 until clean. |
-| `TELL` | A pattern generated sites share: blocklist words, spaced em dashes, `A · B · C` strings, `→` on buttons, all-caps eyebrows, an accented word in the h1, Inter or system fonts, purple gradients, emoji, one radius and shadow on every surface, everything fading up the same way, three equal columns, motion without `prefers-reduced-motion`, anonymous testimonials | Judge each one. Keep it only with a reason that comes from the brief or a reference; write that reason in `DECISIONS.md`. A tell with no reason is removed. |
+| `FAIL` | A ship-checklist item wrong by inspection: visible `[brackets]`, dead links, h1 count, missing title/description/og:image/favicon, images without alt, a multi-column grid with no `@media` rule, **numbers or weekdays on the page that are not in `FACTS.md`** | Fix before deploy. Exit code 1 until clean. |
+| `TELL` | A pattern generated sites share: blocklist words, spaced em dashes, `A · B · C` strings, `→` on buttons, all-caps eyebrows, an accented word in the h1, Inter or system fonts, purple gradients, emoji, one radius and shadow on every surface, everything fading up the same way, three equal columns, motion without `prefers-reduced-motion`, content hidden at rest with no script-gating class (blank with JavaScript off), anonymous testimonials | Judge each one. Keep it only with a reason that comes from the brief or a reference; write that reason in `DECISIONS.md`. A tell with no reason is removed. |
 
 A number the script flags that is on `FACTS.md` under a different spelling (e.g. "1,240" vs "1240") is noise; everything else it flags is a fact drift.
 

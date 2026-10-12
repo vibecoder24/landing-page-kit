@@ -118,8 +118,13 @@ def scan(path, facts_text):
     if len(reveal) >= 3: tells.append(f"{len(reveal)} elements share the same scroll-reveal class (everything fades up the same way)")
     if re.search(r"repeat\(\s*3\s*,", css): tells.append("a three-equal-column grid (hero → 3 feature cards is the template)")
     if re.search(r"(transition|animation)\s*:", css) and "prefers-reduced-motion" not in css: tells.append("motion present but no prefers-reduced-motion rule")
-    if re.search(r"opacity\s*:\s*0\b", css) and "<noscript" not in raw.lower() and "no-js" not in raw:
-        fails.append("elements start at opacity:0 with no <noscript> or no-js fallback: the page is blank with JavaScript off")
+    # opacity:0 at rest is fine when a script-added class gates it (.motion .x, html.js .x) or it is a hover/pseudo decoration
+    gates = set(re.findall(r"classList\.add\(\s*['\"]([\w-]+)", raw))
+    hidden = re.findall(r"([^{}]+)\{([^}]*\bopacity\s*:\s*0(?![.\d])[^}]*)\}", css)
+    ungated = [s.strip().split(",")[0][:50] for s, _ in hidden
+               if not any(f".{g}" in s for g in gates) and "::" not in s and ":hover" not in s and ":focus" not in s]
+    if ungated and "<noscript" not in raw.lower() and "no-js" not in raw:
+        tells.append(f"{len(ungated)} rule(s) hide content at rest with no script-gating class or <noscript>: {ungated[0]!r}. Check the page with JavaScript off")
     if re.search(r"repeat\(\s*[2-9]\s*,", css) and "@media" not in css:
         fails.append("a fixed multi-column grid and no @media rule: it will overflow at 375 px")
     if re.search(r"\b(happy|satisfied|verified) (customer|user|client)\b", low): tells.append("an anonymous testimonial attribution")

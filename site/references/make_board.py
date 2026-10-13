@@ -18,14 +18,17 @@ URL = re.compile(r"https?://\S+")
 
 
 def read_tables(markdown):
-    """Return (section heading, cells) for every table row, and the coverage rows."""
-    rows, section = [], ""
+    """Return (section heading, header cells, cells) for every table body row."""
+    rows, section, header = [], "", []
     for line in markdown.splitlines():
         if line.startswith("#"):
-            section = line.lstrip("#").strip()
+            section, header = line.lstrip("#").strip(), []
         elif line.startswith("|") and not SEPARATOR.match(line):
             cells = [c.strip() for c in line.strip().strip("|").split("|")]
-            rows.append((section, cells))
+            if not header:
+                header = cells
+            else:
+                rows.append((section, header, cells))
     return rows
 
 
@@ -52,18 +55,20 @@ def main():
     cards = []
     for image in images:
         rel = image.relative_to(HERE).as_posix()
-        match = next(((s, c) for s, c in rows if any(image.name in c for c in c)), None)
+        match = next(((s, h, c) for s, h, c in rows if any(image.name in c for c in c)), None)
         if match:
-            section, cells = match
-            cells = [c for c in cells if image.name not in c and not c.isdigit()]
-            urls = [c for c in cells if URL.fullmatch(c)]
-            text = [c for c in cells if c not in urls]
-            name = text[0] if text else image.stem
-            note = " ".join(text[1:]) if len(text) > 1 else ""
+            section, header, cells = match
+            pairs = [(h, c) for h, c in zip(header, cells) if c and image.name not in c and not c.isdigit()]
+            urls = [c for _, c in pairs if URL.fullmatch(c)]
+            text = [(h, c) for h, c in pairs if c not in urls]
+            name = text[0][1] if text else image.stem
+            # the first text cell is the name; the next is the main note; any others are labelled by their column
+            note = text[1][1] if len(text) > 1 else ""
+            extra = "".join(f'<p class="extra"><span>{html.escape(h)}</span> {md_inline(c)}</p>' for h, c in text[2:])
             link = f'<a class="src" href="{html.escape(urls[0])}">{html.escape(urls[0])}</a>' if urls else ""
             tag = f'<span class="tag">{html.escape(section)}</span>'
         else:
-            name, note, link = image.stem, "", ""
+            name, note, extra, link = image.stem, "", "", ""
             tag = '<span class="tag gap">no note yet</span>'
         cards.append(f"""
       <figure>
@@ -72,14 +77,15 @@ def main():
           <div class="head">{tag}<code>{html.escape(rel)}</code></div>
           <h2>{html.escape(name)}</h2>
           <p>{md_inline(note) or '<em>Write the one thing to take from this in NOTES.md.</em>'}</p>
+          {extra}
           {link}
         </figcaption>
       </figure>""")
 
-    coverage = [c for s, c in rows if s.lower().startswith("coverage")]
+    coverage = [(h, c) for s, h, c in rows if s.lower().startswith("coverage")]
     coverage_html = ""
     if coverage:
-        head, *body = coverage
+        head, body = coverage[0][0], [c for _, c in coverage]
         coverage_html = "<table><thead><tr>" + "".join(f"<th>{html.escape(h)}</th>" for h in head) + "</tr></thead><tbody>"
         for cells in body:
             gap = any("gap" in c.lower() for c in cells)
@@ -117,6 +123,8 @@ def main():
   code {{ font-size: 12px; color: var(--muted); }}
   h2 {{ font-size: 17px; margin: 0 0 6px; font-weight: 600; }}
   p {{ margin: 0 0 8px; }}
+  .extra {{ font-size: 13px; color: var(--muted); }}
+  .extra span {{ text-transform: uppercase; font-size: 11px; letter-spacing: .06em; margin-right: 6px; }}
   .src {{ font-size: 12px; color: var(--muted); word-break: break-all; }}
   a {{ color: inherit; }}
 </style>
@@ -133,7 +141,7 @@ def main():
 </html>
 """
     (HERE / "board.html").write_text(page)
-    print(f"board.html: {len(images)} images, {len(coverage) - 1 if coverage else 0} coverage rows")
+    print(f"board.html: {len(images)} images, {len(coverage)} coverage rows")
 
 
 if __name__ == "__main__":

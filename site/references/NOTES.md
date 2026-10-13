@@ -1,6 +1,6 @@
 # References — [Site name]
 
-Collect 6–8 screenshots into this folder. For each one, write a line naming the **one specific thing** to take from it.
+Collect 6–8 screenshots or photos into this folder. `SOURCES.md` (written by Claude from the brief) says where to look beyond websites. For each one, write a line naming the **one specific thing** to take from it.
 Good: "the way the headline serif sits huge and tight over the photo".
 Not useful: "nice and premium".
 
@@ -8,14 +8,14 @@ Name the files `<site>-<n>-<what-it-shows>.jpg` so the table and the folder read
 
 ## Picked
 
-| # | File | Source URL | Take this specific thing |
-|---|------|------------|--------------------------|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
-| 6 | | | |
+| # | File | Source | Take this specific thing | Covers | Don't take |
+|---|------|--------|--------------------------|--------|------------|
+| 1 | | | | | |
+| 2 | | | | | |
+| 3 | | | | | |
+| 4 | | | | | |
+| 5 | | | | | |
+| 6 | | | | | |
 
 ## Coverage check (Stage 1 gate)
 
@@ -30,6 +30,7 @@ Name the files `<site>-<n>-<what-it-shows>.jpg` so the table and the folder read
 | The tone of voice | |
 | The signature move | |
 | The CTA, picker or form | |
+| The motif | |
 
 ## Candidates
 

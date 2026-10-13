@@ -1,0 +1,147 @@
+<title>Page Review</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+  /* Layout: one column of finding cards, each with a focused crop of the marked page beside the verdict controls. */
+  :root {
+    --bg: #f6f5f2; --panel: #ffffff; --fg: #1f2328; --muted: #6a7078; --line: #e3e1db;
+    --accent: #d6336c; --keep: #1f7a4d; --reject: #b42318; --discuss: #b26b00;
+    --font: "IBM Plex Sans", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #16181c; --panel: #1f2227; --fg: #e8e6e1; --muted: #9aa0a8; --line: #30343b; --accent: #ff6b9d; --keep: #4cc38a; --reject: #ff7a6b; --discuss: #e8a93a; color-scheme: dark } }
+  :root[data-theme="dark"] { --bg: #16181c; --panel: #1f2227; --fg: #e8e6e1; --muted: #9aa0a8; --line: #30343b; --accent: #ff6b9d; --keep: #4cc38a; --reject: #ff7a6b; --discuss: #e8a93a; color-scheme: dark }
+  body { background: var(--bg); color: var(--fg); font: 15px/1.5 var(--font); padding-block: 32px 80px; padding-inline: clamp(16px, 4vw, 48px); }
+  h1 { font-size: 26px; font-weight: 600; margin: 0 0 6px; text-wrap: balance }
+  .lede { color: var(--muted); max-width: 64ch; margin: 0 0 20px }
+  .lede a { color: inherit }
+  .tally { display: flex; flex-wrap: wrap; gap: 8px 18px; font-family: var(--mono); font-size: 13px; margin-bottom: 28px; position: sticky; top: env(safe-area-inset-top, 0px); background: var(--bg); padding-block: 10px; z-index: 2; border-bottom: 1px solid var(--line) }
+  .tally b { font-weight: 500 } .k { color: var(--keep) } .r { color: var(--reject) } .d { color: var(--discuss) }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; color: var(--muted); font-size: 13px; margin: 0 0 24px }
+  .legend span::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; background: var(--muted) }
+  .legend .copy::before { background: #7c5cff } .legend .structure::before { background: #0ea5a4 } .legend .design::before { background: #e07a16 } .legend .check::before { background: #6b7280 }
+  .finding { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px; margin-bottom: 14px; align-items: start }
+  .finding[data-verdict="keep"] { border-color: var(--keep) } .finding[data-verdict="reject"] { border-color: var(--reject); opacity: .78 } .finding[data-verdict="discuss"] { border-color: var(--discuss) }
+  .num { display: inline-block; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font: 600 13px/26px var(--font); text-align: center; margin-right: 8px; vertical-align: middle }
+  .cat { font-size: 12px; color: var(--muted); letter-spacing: .02em; margin-left: 4px }
+  .cat::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; background: var(--muted) }
+  .cat.copy::before { background: #7c5cff } .cat.structure::before { background: #0ea5a4 } .cat.design::before { background: #e07a16 } .cat.check::before { background: #6b7280 }
+  .finding h2 { font-size: 16px; font-weight: 600; margin: 10px 0 6px; text-wrap: balance }
+  .finding p { margin: 0 0 10px; color: var(--fg) }
+  .src { font-size: 12px; color: var(--muted); margin-bottom: 12px }
+  .verdict { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px }
+  .verdict button { font: 500 13px var(--font); padding: 7px 12px; border-radius: 6px; border: 1px solid var(--line); background: transparent; color: var(--fg); cursor: pointer; min-height: 34px }
+  .verdict button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+  .verdict button[data-v="keep"].on { background: var(--keep); border-color: var(--keep); color: #fff }
+  .verdict button[data-v="reject"].on { background: var(--reject); border-color: var(--reject); color: #fff }
+  .verdict button[data-v="discuss"].on { background: var(--discuss); border-color: var(--discuss); color: #fff }
+  textarea { width: 100%; min-height: 64px; font: 14px/1.45 var(--font); color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; resize: vertical; box-sizing: border-box }
+  textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px }
+  .saved { font-size: 12px; color: var(--muted); min-height: 16px; margin-top: 4px }
+  .crop { position: relative; height: 230px; overflow: hidden; border-radius: 8px; border: 1px solid var(--line); background: #f0efe9 }
+  .crop img { width: 100%; display: block; will-change: transform }
+  .crop.full { height: auto } .crop.full img { transform: none !important }
+  .cropbtn { position: absolute; right: 8px; bottom: 8px; font: 500 12px var(--font); padding: 5px 9px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); cursor: pointer }
+  .status { font-size: 13px; color: var(--muted); margin: 0 0 20px }
+  @media (max-width: 760px) { .finding { grid-template-columns: 1fr } .crop { order: -1 } }
+  @media (prefers-reduced-motion: no-preference) { .finding { transition: border-color .15s } }
+</style>
+
+<h1>[Site name] review</h1>
+<p class="lede">[N] findings from the review of <a href="[deployed URL]">[deployed URL]</a> on [date], each marked on the page at the spot it refers to. Choose Keep, Reject or Discuss on each and add a note where it helps. Your choices save as you go.</p>
+<div class="tally" id="tally"><b>0 of 0 decided</b> <span class="k">keep 0</span> <span class="r">reject 0</span> <span class="d">discuss 0</span></div>
+<div class="legend"><span class="copy">Copy</span><span class="structure">Structure and conversion</span><span class="design">Design</span><span class="check">Checklist</span></div>
+<p class="status" id="status">Loading saved decisions…</p>
+<div id="list"></div>
+
+<script>
+const SHOT_TOPS = [0, 720, 1440]; // the scrollY of each screenshot in shots/s0.jpg, s1.jpg, …
+const F = [
+  // One entry per finding, in page order. n = the marker number from mark_findings.js, y = its page y,
+  // cat = copy | structure | design | check, t = the finding, d = the evidence, s = what found it.
+  { n: 1, cat: "copy", y: 200, t: "[The headline is a line any competitor could run]", d: "[Quote the line and say why.]", s: "[Copy critic]" },
+  { n: 2, cat: "structure", y: 400, t: "[The CTA goes nowhere]", d: "[href=\"#\" on both buttons.]", s: "[Scanner]" },
+];
+const shotFor = y => { let k = 0; for (let i = 0; i < SHOT_TOPS.length; i++) if (y >= SHOT_TOPS[i] + 40 || i === 0) k = i; return k; };
+const list = document.getElementById("list");
+const state = {};
+for (const f of F) {
+  const k = shotFor(f.y);
+  const el = document.createElement("section");
+  el.className = "finding"; el.id = "f" + f.n; el.dataset.n = f.n;
+  el.innerHTML = `
+    <div>
+      <span class="num">${f.n}</span><span class="cat ${f.cat}">${{copy:"Copy",structure:"Structure and conversion",design:"Design",check:"Checklist"}[f.cat]}</span>
+      <h2>${f.t}</h2>
+      <p>${f.d}</p>
+      <div class="src">Found by: ${f.s}</div>
+      <div class="verdict" role="group" aria-label="Verdict for finding ${f.n}">
+        <button type="button" data-v="keep">Keep</button>
+        <button type="button" data-v="reject">Reject</button>
+        <button type="button" data-v="discuss">Discuss</button>
+      </div>
+      <label for="c${f.n}" style="font-size:12px;color:var(--muted)">Note</label>
+      <textarea id="c${f.n}" placeholder="Why, or what you would do instead"></textarea>
+      <div class="saved" id="s${f.n}"></div>
+    </div>
+    <div class="crop" data-shot="${k}" data-y="${f.y}">
+      <img src="shots/s${k}.jpg" alt="Screenshot of the ProfylPages page around finding ${f.n}, with a numbered marker" loading="lazy">
+      <button type="button" class="cropbtn">Show full screenshot</button>
+    </div>`;
+  list.appendChild(el);
+}
+// Position each crop so the marker sits a third of the way down the window.
+function layoutCrops() {
+  document.querySelectorAll(".crop").forEach(c => {
+    if (c.classList.contains("full")) return;
+    const img = c.querySelector("img"), k = +c.dataset.shot, y = +c.dataset.y;
+    const scale = c.clientWidth / 1024, localY = (y - SHOT_TOPS[k]) * scale;
+    const maxShift = Math.max(0, img.clientHeight - c.clientHeight);
+    img.style.transform = `translateY(-${Math.min(maxShift, Math.max(0, localY - 80))}px)`;
+  });
+}
+document.querySelectorAll(".crop img").forEach(i => i.addEventListener("load", layoutCrops));
+addEventListener("resize", layoutCrops); layoutCrops();
+document.querySelectorAll(".cropbtn").forEach(b => b.addEventListener("click", () => { const c = b.closest(".crop"); c.classList.toggle("full"); b.textContent = c.classList.contains("full") ? "Show crop" : "Show full screenshot"; layoutCrops(); }));
+
+// Verdicts and notes, saved to the artifact's database (owner and editors write; others see read-only).
+function paint(n) {
+  const s = state[n] || {}; const el = document.getElementById("f" + n);
+  el.dataset.verdict = s.verdict || "";
+  el.querySelectorAll(".verdict button").forEach(b => b.classList.toggle("on", b.dataset.v === s.verdict));
+  const ta = el.querySelector("textarea"); if (document.activeElement !== ta && (s.comment || "") !== ta.value) ta.value = s.comment || "";
+}
+function tally() {
+  const vs = Object.values(state).map(s => s.verdict).filter(Boolean);
+  const c = v => vs.filter(x => x === v).length;
+  document.getElementById("tally").innerHTML = `<b>${vs.length} of ${F.length} decided</b> <span class="k">keep ${c("keep")}</span> <span class="r">reject ${c("reject")}</span> <span class="d">discuss ${c("discuss")}</span>`;
+}
+let db = null, canWrite = false;
+const timers = {};
+async function save(n, patch) {
+  state[n] = Object.assign({}, state[n], patch); paint(n); tally();
+  const out = document.getElementById("s" + n);
+  if (!db) { try { localStorage.setItem("review:" + n, JSON.stringify(state[n])); out.textContent = "Saved in this browser"; } catch (e) { out.textContent = "Not saved: storage is unavailable here."; } return; }
+  if (!canWrite) { out.textContent = "Read-only view: choices are not saved."; return; }
+  out.textContent = "Saving…";
+  try { await db.doc("decisions/f" + n).set(Object.assign({ finding: n, title: F[n - 1].t }, state[n], { updatedAt: new Date().toISOString() })); out.textContent = "Saved"; }
+  catch (e) { out.textContent = e && e.code === "invalid_argument" ? "Read-only view: choices are not saved." : "Could not save; try again."; if (e && e.code === "invalid_argument") canWrite = false; }
+}
+document.querySelectorAll(".verdict button").forEach(b => b.addEventListener("click", () => { const n = +b.closest(".finding").dataset.n; save(n, { verdict: (state[n] || {}).verdict === b.dataset.v ? "" : b.dataset.v }); }));
+document.querySelectorAll("textarea").forEach(t => t.addEventListener("input", () => { const n = +t.closest(".finding").dataset.n; clearTimeout(timers[n]); timers[n] = setTimeout(() => save(n, { comment: t.value }), 700); }));
+
+(async () => {
+  const status = document.getElementById("status");
+  db = window.claude && window.claude.use ? await window.claude.use("db") : null;
+  if (!db) {
+    status.textContent = "Opened as a file: choices save in this browser only.";
+    F.forEach(f => { try { const v = JSON.parse(localStorage.getItem("review:" + f.n) || "null"); if (v) { state[f.n] = v; paint(f.n); } } catch (e) {} });
+    tally(); return;
+  }
+  const user = await window.claude.use("user");
+  const cw = user ? await user.can("data.write") : null; canWrite = cw !== false;
+  status.textContent = canWrite ? "Choices save automatically." : "Read-only view.";
+  db.collection("decisions").onSnapshot(snap => {
+    snap.docs.forEach(d => { const v = d.data(); if (!v) return; const n = +String(d.id).replace("f", ""); if (!F[n - 1]) return; state[n] = { verdict: v.verdict || "", comment: v.comment || "" }; paint(n); });
+    tally();
+  }, e => { status.textContent = "Live updates stopped; reload to see the latest."; });
+})();
+</script>

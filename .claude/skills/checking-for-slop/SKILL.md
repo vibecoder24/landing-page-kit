@@ -46,6 +46,15 @@ This pass **reports; it does not edit the page.** Fixes are decided with the own
 
 Lead with the one job: can a visitor do it end to end? Then the FAILs from the scanner and the probe, then the tells with a keep/remove verdict each, then the readers' quotes, then the top three improvements by impact. Log the round in `site/DECISIONS.md`. If the Stage 0 entry there is still the template, say so in the report: a page built without a brief is the finding, not the numbers.
 
+## Step 4 — Mark the findings on the page and hand over a review page
+
+The owner decides each finding once, with the page in front of them. Two files make that cheap:
+
+1. **`mark_findings.js`**: paste into the browser's JavaScript tool on the deployed page, with one entry per finding (`{n, text}` or `{n, selector}`). It drops a numbered badge and a dashed outline on each element and returns every marker's page `y`. Then screenshot every 720 px from the top (the script turns smooth scrolling off; use `scrollTo({top, behavior: "instant"})` between shots) and save them as `shots/s0.jpg`, `s1.jpg`, …
+2. **`review_page.html`**: copy it next to the `shots/` folder, fill `F` (one entry per finding: number, category, marker `y`, title, evidence, what found it) and `SHOT_TOPS` (the scrollY of each shot). Each finding renders with a crop of its screenshot, Keep / Reject / Discuss buttons and a note box. Published as a claude.ai artifact with `capabilities: {db: {}, user: {}}` the choices save to the artifact's database, where `ArtifactData` reads them back; opened as a plain file, they save in the browser's local storage.
+
+Read the verdicts back before any rebuild. Kept findings become the change list for the next review round; rejected ones go into `DECISIONS.md` with the owner's reason, so the next critic does not raise them again.
+
 ## Common mistakes
 
 - Running the scanner on a prototype before Stage 4 and treating missing `og:image` as a finding. Before deploy, only the TELLs and the number check matter.

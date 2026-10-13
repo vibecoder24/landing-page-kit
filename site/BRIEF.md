@@ -79,7 +79,7 @@ Fill each section in your own words. The italic line under each heading says wha
 [ ]
 
 ## Stack
-*Decide now, do not defer. Default: Next.js (App Router) + Tailwind, fonts via `next/font`, GSAP + ScrollTrigger or Motion for scroll. A single static HTML file is fine for a one-page site if you choose it here.*
+*Decide now, do not defer. Static HTML if the page is one document with no state beyond a click (a scroll story, a buy button). Next.js (App Router) + Tailwind, fonts via `next/font`, if the page has a stateful component (a demo, configurator, calculator, upload or API form) or will be the template for later sites. GSAP + ScrollTrigger or Motion for scroll either way. No UI component library by default; see Default stack in `CLAUDE.md`. Write the choice and the reason.*
 
 [ ]
 

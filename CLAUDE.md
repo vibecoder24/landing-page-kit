@@ -172,7 +172,10 @@ If a reference or the brief deliberately calls for one of these, that's fine. Th
 
 ## Default stack
 
-- **Next.js (App Router) + Tailwind CSS**; fonts via `next/font`. A single static HTML file is acceptable for a one-page site **if the brief says so**; decide in Stage 0, don't defer a port.
+- **Next.js (App Router) + Tailwind CSS**; fonts via `next/font`. A single static HTML file is acceptable for a one-page site **if the brief says so**; decide in Stage 0, don't defer a port. The rule:
+  - **Static HTML** when the page is one document with no state that outlives a click: a scroll story, a buy button, a mailto link. One file a learner can read top to bottom. The coffee site fits this.
+  - **Next.js** when the page has a stateful component (a demo that plays, a configurator, a calculator, an upload, a form that calls an API), or when this site becomes the template for later ones. The voice-agent site chose it for its call demo.
+- **No UI component library by default** (shadcn, MUI, Chakra, DaisyUI). A landing page has a dozen components, and a library's defaults (radii, shadows, greys, Inter) are where the generic look comes from. Hand-write HTML and CSS on the design tokens. When the conversion path needs a select, dialog, slider or tabs, pull in that one Radix primitive unstyled, style it from the tokens, and log it in `DECISIONS.md` with its bundle cost. Never install the full shadcn preset or theme.
 - **Scroll and motion:** GSAP + ScrollTrigger, or Motion (Framer Motion)
 - **3D:** three.js via React Three Fiber + drei
 - **Video:** Remotion

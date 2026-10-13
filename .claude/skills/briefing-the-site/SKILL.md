@@ -31,7 +31,7 @@ One question per message. Offer two to four options where you can, the recommend
 9. Headline job: sell first or feel first
 10. The hero object or motif: one object or shape from the product or the place
 11. The signature move, in one sentence
-12. Stack, decided now
+12. Stack, decided now. Static HTML if the page is one document with no state beyond a click; Next.js if it has a stateful component (a demo, configurator, calculator, upload or API form) or will be the template for later sites. Either way, no UI component library by default; the Default stack section of `CLAUDE.md` has the rule
 13. Facts: every number, day, price and place name the answers mentioned, read back once for confirmation
 
 Questions about fonts, colours and layout belong to Stage 2. Do not ask them here.

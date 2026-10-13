@@ -15,6 +15,7 @@ site/
   DECISIONS.md          a running log of what was chosen and why
   LEARNINGS.md          the retrospective, written at the end
   references/NOTES.md   6–8 screenshots and the one thing to take from each
+  references/make_board.py  builds board.html: every screenshot beside its note, to pick from
   assets/PROMPTS.md     a log of every generated image or video
   scripts/              two Python scripts for generating stills and video (optional, paid)
   .env.example          where the API key goes
